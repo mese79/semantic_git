@@ -1,0 +1,27 @@
+semantic,command,category,comment
+get version,git --version,git,print installed git version
+create new repository,git init,init,create a new repository at current directory
+create new repository at {0},git init {0},init,create a new repository at given directory
+create new repository with {0} as default branch,git init -b {0},init,create a new repository at current directory with given name for default branch
+create new repository with default branch named {0},git init -b {0},init,create a new repository at current directory with given name for default branch
+create new repository at {0} with {1} as default branch,git init -b {1} {0},init,create a new repository at given directory with given name for default branch
+create new repository at {0} with default branch named {1},git init -b {1} {0},init,create a new repository at given directory with given name for default branch
+clone from {0},git clone {0} --progress,clone,clone the given repository into current directory
+clone from {0} to {1},git clone {0} {1} --progress,clone,clone the given repository into given directory
+get status,git status --ignored,status,"List which files are staged, unstaged, untracked and ignored"
+show status,git status --ignored,status,"List which files are staged, unstaged, untracked and ignored"
+commit with message {0},git commit --verbose -m "{0}",commit,record changes to the repository with given one-line message
+commit with {0},git commit --verbose -m "{0}",commit,record changes to the repository with given one-line message
+commit all with message {0},git commit --verbose -a -m "{0}",commit,"automatically stage files that have been modified and deleted, but not new files and record changes"
+commit all with {0},git commit --verbose -a -m "{0}",commit,"automatically stage files that have been modified and deleted, but not new files and record changes"
+stage {*},git add --verbose {0},add,add file(s) to stage area for later commit
+stage all,git add --verbose .,add,add file(s) to stage area for later commit
+stage all except {*},git_helper stage_all_except,add,add all files to stage area except chosen ones
+ignore {*},git_helper ignore,git_helper,make all given file(s)/folder(s) to be ignored by git(create .gitignore file)
+remove from gitignore {*},git_helper unignore,git_helper,remove given file(s)/folder(s) from .gitignore file
+unstage {0},git reset -- {0},reset,remove given file from stage area
+unstage all,git reset,reset,remove all files from stage area
+discard changes of {0},git checkout -- {0},checkout,discard uncommited changes of given files
+undo changes of {0},git checkout -- {0},checkout,discard uncommited changes of given files
+discard all changes,git checkout .,checkout,discard all uncommited changes of all files
+undo all changes,git checkout .,checkout,discard all uncommited changes of all files

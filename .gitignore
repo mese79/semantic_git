@@ -1,0 +1,4 @@
+tmp/**
+tmp
+__pycache__
+semantic_git.egg-info
