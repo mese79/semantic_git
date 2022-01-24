@@ -6,22 +6,93 @@ create new repository with {0} as default branch,git init -b {0},init,create a n
 create new repository with default branch named {0},git init -b {0},init,create a new repository at current directory with given name for default branch
 create new repository at {0} with {1} as default branch,git init -b {1} {0},init,create a new repository at given directory with given name for default branch
 create new repository at {0} with default branch named {1},git init -b {1} {0},init,create a new repository at given directory with given name for default branch
-clone from {0},git clone {0} --progress,clone,clone the given repository into current directory
-clone from {0} to {1},git clone {0} {1} --progress,clone,clone the given repository into given directory
+clone from {0},git clone --progress {0},clone,clone the given repository into current directory
+clone from {0} to {1},git clone --progress {0} {1},clone,clone the given repository into given directory
+clone from {0} with submodules,git clone --progress --recurse-submodules {0},clone,clone the given repository with all submodules into current directory
+status,git status --ignored,status,"List which files are staged, unstaged, untracked and ignored"
 get status,git status --ignored,status,"List which files are staged, unstaged, untracked and ignored"
 show status,git status --ignored,status,"List which files are staged, unstaged, untracked and ignored"
+stage {*},git add --verbose {0},stage,add file(s) to stage area for later commit
+stage all,git add --verbose .,stage,add file(s) to stage area for later commit
+stage all except {*},git_helper stage_all_except,stage,add all files to stage area except chosen ones
+ignore {*},git_helper ignore,stage,make all given file(s)/folder(s) to be ignored by git(create .gitignore file)
+remove from gitignore {*},git_helper unignore,stage,remove given file(s)/folder(s) from .gitignore file
+unstage {0},git restore --staged --progress -- {0},restore,remove given file from stage area
+unstage all,git restore --staged --progress -- .,restore,remove all files from stage area
+undo changes of {0},git restore --progress -- {0},restore,undo uncommited changes of given files
+discard changes of {0},git restore --progress -- {0},restore,undo uncommited changes of given files
+discard all changes,git restore --progress -- .,restore,discard all uncommited changes of all files
+undo all changes,git restore --progress -- .,restore,discard all uncommited changes of all files
 commit with message {0},git commit --verbose -m "{0}",commit,record changes to the repository with given one-line message
 commit with {0},git commit --verbose -m "{0}",commit,record changes to the repository with given one-line message
 commit all with message {0},git commit --verbose -a -m "{0}",commit,"automatically stage files that have been modified and deleted, but not new files and record changes"
 commit all with {0},git commit --verbose -a -m "{0}",commit,"automatically stage files that have been modified and deleted, but not new files and record changes"
-stage {*},git add --verbose {0},add,add file(s) to stage area for later commit
-stage all,git add --verbose .,add,add file(s) to stage area for later commit
-stage all except {*},git_helper stage_all_except,add,add all files to stage area except chosen ones
-ignore {*},git_helper ignore,git_helper,make all given file(s)/folder(s) to be ignored by git(create .gitignore file)
-remove from gitignore {*},git_helper unignore,git_helper,remove given file(s)/folder(s) from .gitignore file
-unstage {0},git reset -- {0},reset,remove given file from stage area
-unstage all,git reset,reset,remove all files from stage area
-discard changes of {0},git checkout -- {0},checkout,discard uncommited changes of given files
-undo changes of {0},git checkout -- {0},checkout,discard uncommited changes of given files
-discard all changes,git checkout .,checkout,discard all uncommited changes of all files
-undo all changes,git checkout .,checkout,discard all uncommited changes of all files
+commit with long message,git commit --verbose --edit,commit,commit changes while opening editor to enter a multiline commit message
+edit last commit with message {0},git commit --verbose --amend -m "{0}",commit,modify the most recent commit by combine staged changes with the previous commit
+edit last commit with {0},git commit --verbose --amend -m "{0}",commit,modify the most recent commit by combine staged changes with the previous commit
+show log,git log,log,show the commit logs
+show short log,git log --oneline --graph,log,show the commit logs in short format
+show log of last {0} commits,git log -n {0},log,show logs of last n commits
+show short log of last {0} commits,git log --oneline --graph -n {0},log,show logs of last n commits in short format
+show log after date {0},git log --after={0},log,show commits more recent than given date
+show log before date {0},git log --before={0},log,show commits more recent than given date
+show log of author {0},git log --author={0},log,show commits of matched author
+list branches,git branch --list,branch,show list of all local branches
+list remote branches,git branch --list -r,branch,show list of all remote branches
+list all branches,git branch --list -a,branch,show list of all local and remote branches
+create new branch {0},git branch {0},branch,create a new branch by given name
+rename branch {0} to {1},git branch -m {0} {1},branch,rename a given branch to new given name
+rename branch {0} to {1} by force,git branch -M {0} {1},branch,rename a given branch to new given name even if new name exists already
+copy branch {0} to {1},git branch -c {0} {1},branch,copy a given branch and its content into a new branch by given name
+copy branch {0} to {1} by force,git branch -c {0} {1},branch,copy a given branch and its content into a new branch by given name if new name exists already
+delete branch {*},git branch -d {*},branch,delete given branches
+delete branch {0} by force,git branch -D {0},branch,delete a given branch forcibly
+delete remote branch {0},git branch -r -d {0},branch,delete a given remote branch
+switch to {0},git switch {0},branch,switch to a given branch
+show all changes,git diff --stat,diff,show all changes on stage area that are ready to commit
+show changes of {0},git diff --stat -- {0},diff,show changes of given file
+show local changes of {0},git diff --stat --staged -- {0},diff,show local changes of given file
+show changes between {0} and head,git diff --stat {0} HEAD,diff,show changes between given commit and HEAD
+show changes between {0} and {1},git diff --stat {0} {1},diff,"show changes between two given commits, branches, ..."
+show changes of {0} between {1} and {2},git diff --stat {1} {2} -- {0},diff,"show changes of given file between two given commits, branches, ..."
+merge {0},git merge --stat --progress {0},merge,merge given branch or commit into current branch
+merge {0} with message {1},git merge --stat --progress -m {1} {0},merge,merge given branch or commit into current branch with given commit message
+merge {0} with no commit,git merge --no-commit --stat --progress {0},merge,merge given branch or commit into current branch but do not commit changes
+abort merge,git merge --abort --stat --progress,merge,try to abort previous merge that had conflicts and undo changes as much possible
+list all tags,git tag --list,tag,list all tags
+delete tag {0},git tag --delete {0},tag,delete given tag
+create annotated tag {0} with message {1},git tag --annotate -m {1} {0},tag,create an annotated tag with given name and given message
+create signed tag {0} with message {1},git tag --sign -m {1} {0},tag,create a signed tag with given name and given message
+verify tag {0},git tag --verify {0},tag,verify the GPG signature of the given tag name
+show remote info,git remote -v,remote,show remote information of repository
+show remote,git remote -v,remote,show remote information of repository
+show remote info of {0},git remote show {0},remote,show more information about a particular remote
+rename remote from {0} to {1},git remote -v rename {0} {1},remote,rename remote
+remove remote {0},git remote -v remove {0},remote,remove given remote name
+add remote {0} with url {1},git remote -v add {0} {1},remote,add a remote by given name for the repository at given url
+add {0} as remote with url {1},git remote -v add {0} {1},remote,add a remote by given name for the repository at given url
+pull all,git pull --progress --all --stat,pull,download content from all remotes and merge
+pull from {0},git pull --progress --stat {0},pull,download content from given remote and merge
+pull from {0} at {1},git pull --progress --stat {0} {1},pull,download content from given remote and given branch or tag or ... and merge
+fetch all,git fetch --progress --all,fetch,download content from all remotes
+fetch from {0},git fetch --progress {0},fetch,download content from given remote
+fetch from {0} at {1},git fetch --progress {0} {1},fetch,download content from given remote and given branch or tag or ...
+push all,git push --progress --all --tags,push,upload local content from all branches into remote repository
+push {0} to {1},git push --progress {1} {0},push,upload local content from given branch into same branch of given remote repository
+push branch {0} to branch {1} at remote {2},git push --progress {2} {0}:{1},push,upload local content from given branch into specified branch of named remote repository
+go to commit {0},git checkout --progress {0},checkout,move HEAD to given commit or tag or ...
+go to {0},git checkout --progress {0},checkout,move HEAD to given commit or tag or ...
+go back to previous commit,git checkout --progress HEAD^,checkout,move HEAD to must recent commit before current one
+go {0} commits back,git checkout --progress HEAD~{0},checkout,move HEAD back to n given commit before current one
+restore {0} from {1},git restore --progress --source {1} {0},restore,restore (replace) given file from given commit or tag or ...
+replace {0} from {1},git restore --progress --source {1} {0},restore,restore (replace) given file from given commit or tag or ...
+remove {0},git rm -- {0},remove,remove given file from working directory
+remove {0} by force,git rm -f -- {0},remove,force remove given file from working directory
+remove files {*},git rm -- {*},remove,remove all given files from working directory
+remove folder {0},git rm -r -- {0},remove,remove given folder and its content from working directory
+revert to {0},git revert {0},revert,fall back into given commit and open editor to edit commit message
+fall back into {0},git revert {0},revert,fall back into given commit and open editor to edit commit message
+revert to {0} with no commit,git revert --no-commit {0},revert,fall back into given commit without making a new commit
+fall back into {0} with no commit,git revert --no-commit {0},revert,fall back into given commit without making a new commit
+rename {0} to {1},git mv {0} {1},mv,rename or move given file into new given name or place
+move {0} to {1},git mv {0} {1},mv,rename or move given file into new given name or place

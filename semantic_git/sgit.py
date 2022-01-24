@@ -169,7 +169,8 @@ def run_make_db(inputs):
 
 
 def list_commands():
-    # return list of all available commands in csv table.
+    # return list of all available commands in csv file
+    # group by command and comment.
     csv_file = Path(resource_filename(__name__, USER_CSV))
     if not csv_file.exists():
         csv_file = Path(resource_filename(__name__, ORIGINAL_CSV))
