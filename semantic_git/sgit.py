@@ -2,24 +2,27 @@
 
 import sys
 import argparse
-from pathlib import Path
 import pickle
 import csv
-from colorama import init, Fore, Back
+from pathlib import Path
+from itertools import chain
+from typing import List
+from colorama import init, Fore, Back, Style
 from pkg_resources import resource_filename
 
-from make_db import (
-    make_db, SINGLE_PARAM, MULTI_PARAM,
+from dataset import (
+    generate_db, SINGLE_PARAM, MULTI_PARAM,
     ORIGINAL_CSV, USER_CSV
 )
 from git_helper import (
     run_command, print_error,
     call_function
 )
+import help
 
 
-# colorama
-init()
+init()         # init colorama
+TAG_SEP = '|'  # tag and param field separator
 
 
 def main():
@@ -27,49 +30,31 @@ def main():
     cmd_parser = argparse.ArgumentParser(
         prog='sgit',
         description='Semantic (plain english) commands for git!',
-        epilog=f'for example:  {Back.BLUE}{Fore.WHITE}sgit create new repository'
+        add_help=False,
+        epilog=f'for example:  {Back.BLUE}{Fore.WHITE}list all branches'
         f'{Back.RESET}{Fore.RESET}'
     )
-    cmd_parser.add_argument(
-        '--make-db', action='store_true',
-        help='generate command dataset from csv file'
-    )
-    cmd_parser.add_argument(
-        '--list', '-l', action='store_true',
-        help='list all possible commands'
-    )
+    cmd_parser.add_argument('--help', '-h', action='store_true', help='show help')
     cmd_parser.add_argument(
         '--demo', '-d', action='store_true',
-        help='just show the final command without running it'
+        help='just print the final command without running it'
     )
     cmd_parser.add_argument(
         'command', action='store', nargs='*', default='',
-        help='git command in plain english'
+        help='your command in plain english'
     )
 
     args = cmd_parser.parse_args()
 
-    # on --make-db just generate dataset and exit.
-    if args.make_db:
-        print('\ngenerating command trees dataset...\n')
-        if run_make_db(args.command):
-            sys.exit(0)
-        else:
-            sys.exit(1)
-    # -------------------------------------------------------------
-
-    # on --list switch list all available commands.
-    if args.list:
-        cmd_list = list_commands()
-        print(f'{cmd_parser.format_help()}\n{cmd_list}')
-        print('\n\n{x} will be replaced by your input.\n')
+    # on --help or -h
+    if args.help:
+        show_help()
         sys.exit(0)
-    # -------------------------------------------------------------
 
-    # check and run given command
+    # no command
     if not args.command:
-        cmd_parser.print_help()
-        print('\nNo command was given!\n')
+        show_help()
+        print('No command was given!\n')
         sys.exit(0)
 
     # load datasets
@@ -86,34 +71,8 @@ def main():
         )
         sys.exit(1)
 
-    cmd_key = [args.command[0]]                # to get command from dict
-    next_words = keywords_db[args.command[0]]  # list of next accepted words
-    params = []                                # user input parameters
-    for idx in range(1, len(args.command)):
-        w = args.command[idx]
-        if w not in next_words:
-            # current word is not in list of next accepted words:
-            # maybe it is a parameter:
-            # check if parameter is in next words list.
-            if SINGLE_PARAM in next_words:
-                params.append(w)
-                w = SINGLE_PARAM
-            else:
-                # there is no command with such input words sequence.
-                # maybe the rest of input are parameters.
-                params.extend(args.command[idx:])
-                # replace single param with multi-param keyword or
-                # add it if it's not in command key.
-                if cmd_key[-1] == SINGLE_PARAM:
-                    cmd_key[-1] = MULTI_PARAM
-                else:
-                    cmd_key.append(MULTI_PARAM)
-                break  # loop
-
-        # add current word (w) to command key
-        cmd_key.append(w)
-        # get list of next accepted words after current word (w)
-        next_words = keywords_db['/'.join(cmd_key)]
+    # get command and its possible parameters
+    cmd_key, params = extract_command_and_params(args.command, keywords_db)
 
     # try to find the command in dataset:
     cmd_key = '/'.join(cmd_key)
@@ -125,13 +84,19 @@ def main():
         )
         sys.exit(1)
 
-    # if command is a git_helper function, call it!
+    # handle sgit utility commands like generate_db or list_commands
+    if command.startswith('sgit'):
+        exit_code = handle_utility_command(command, params)
+        sys.exit(exit_code)
+
+    # handle git_helper function call
     if command.startswith('git_helper') and not args.demo:
-        if call_function(command.split()[1], params):
+        if call_function(command.split(' ')[1], params):
             sys.exit(0)
         else:
             sys.exit(1)
 
+    # now, it's a git command!
     # match command parameters with user input parameters
     num_params = cmd_key.count(SINGLE_PARAM)
     # if command accepts multi-parameters too:
@@ -156,21 +121,63 @@ def main():
             run_command(command)
 
 
-def run_make_db(inputs):
-    csv_file = Path(resource_filename(__name__, 'original_cmd_table.csv'))
-    if inputs:
-        csv_file = Path(inputs[0])
+def extract_command_and_params(cmd_words, keywords_db):
+    # main loop to digest given command and parameters
+    cmd_key = [cmd_words[0]]                # to get command from dict
+    next_words = keywords_db[cmd_words[0]]  # list of next accepted words
+    params = []                             # user input parameters
+    for idx in range(1, len(cmd_words)):
+        w = cmd_words[idx]
+        if w not in next_words:
+            # current word is not in list of next accepted words:
+            # maybe it is a parameter:
+            # check if parameter is in next words list.
+            if SINGLE_PARAM in next_words:
+                params.append(w)
+                w = SINGLE_PARAM
+            else:
+                # there is no command with such input words sequence.
+                # maybe the rest of input are parameters.
+                params.extend(cmd_words[idx:])
+                # replace single param with multi-param keyword or
+                # add it if it's not in command key.
+                if cmd_key[-1] == SINGLE_PARAM:
+                    cmd_key[-1] = MULTI_PARAM
+                else:
+                    cmd_key.append(MULTI_PARAM)
+                break  # loop
+
+        # add current word (w) to command key
+        cmd_key.append(w)
+        # get list of next accepted words after current word (w)
+        next_words = keywords_db['/'.join(cmd_key)]
+
+    return cmd_key, params
+
+
+def handle_utility_command(command, params):
+    func_name = command.split(' ')[1]
+    func = globals().get(func_name)
+    if func is None:
+        print_error(f'function {func_name} was not found!')
+        return 1
+
+    return int(not func(params))
+
+
+def run_generate_db(params):
+    csv_file = Path(resource_filename(__name__, ORIGINAL_CSV))
+    if params:
+        csv_file = Path(params[0])
     if not csv_file.exists():
         print(f'{Fore.RED}Missing file at {csv_file.absolute()}\n')
         return False
 
-    make_db(csv_file)
+    generate_db(csv_file)
     return True
 
 
-def list_commands():
-    # return list of all available commands in csv file
-    # group by command and comment.
+def read_csv() -> List[dict]:
     csv_file = Path(resource_filename(__name__, USER_CSV))
     if not csv_file.exists():
         csv_file = Path(resource_filename(__name__, ORIGINAL_CSV))
@@ -178,30 +185,87 @@ def list_commands():
     with open(csv_file, mode='r') as f:
         csv_rows = list(csv.DictReader(f, skipinitialspace=True))
 
+    return csv_rows
+
+
+def list_commands(params=None):
+    # return list of all available commands in csv file
+    # group by command and comment.
+    csv_rows = read_csv()
+
     cmd_list = []
     semantics = []
+    params = []
     prev_cmd = csv_rows[0]['command']
     prev_comment = csv_rows[0]['comment']
+    params.append(csv_rows[0]['params'])
     for row in csv_rows:
         if prev_cmd != row['command'] or prev_comment != row['comment']:
             cmd_list.append((semantics, prev_comment))
             semantics = []
             prev_cmd = row['command']
             prev_comment = row['comment']
+            params.append(row['params'])
 
         semantics.append(row['semantic'])
     # add last one to command list
     cmd_list.append((semantics, row['comment']))
+    params.append(row['params'])
+    # prettify params
+    for i, plist in enumerate(params):
+        plist = ', '.join(plist.split(TAG_SEP))
+        params[i] = f'{Style.DIM}{Fore.CYAN}{plist}{Style.RESET_ALL}'
+        if plist:
+            params[i] += '\n'
 
-    return f'List of available commands(in {Fore.BLUE}blue{Fore.RESET}):\n\n' + \
+    cmd_list = f'List of available commands(in {Fore.BLUE}blue{Fore.RESET}):\n\n' + \
         '\n\n'.join([
-            f'{Fore.BLUE}' + '\n'.join(semantics) +
-            f'{Fore.RESET}\n{comment}' for semantics, comment in cmd_list
+            f'{help.Text.BOLD}{Fore.BLUE}' + '\n'.join(semantics) +
+            f'{Fore.RESET}{help.Text.OFF}\n{param}{comment}'
+            for (semantics, comment), param in zip(cmd_list, params)
         ])
 
+    print(f'{cmd_list}', f'\n\n\n{help.param}')
 
 
+def list_tags(params=None):
+    csv_rows = read_csv()
+    tags = [row['tags'].split(TAG_SEP) for row in csv_rows]
+    tags = list(set(chain.from_iterable(tags)))
+    tags.sort()
+    longest = max([len(t) for t in tags]) + 4
+    per_line = 5
+    num_bins, rem = divmod(len(tags), per_line)
+    if rem > 0:
+        num_bins += 1
+    print(help.tags)
+    for i in range(num_bins):
+        end = min((i + 1) * per_line, len(tags))
+        row = [t.ljust(longest) for t in tags[i * per_line: end]]
+        print(''.join(row))
+    print()
 
+
+def list_by_tag(params):
+    csv_rows = read_csv()
+    tag = params[0]
+    results = [
+        (row['semantic'], row['params'].replace(TAG_SEP, ', '), row['comment'])
+        for row in csv_rows if tag in row['tags']
+    ]
+    print(
+        '\n\n'.join([
+            f'{Fore.BLUE}{item[0]}{Fore.RESET}\n' +
+            f'{Style.DIM}{Fore.CYAN}{item[1]}{Style.RESET_ALL}\n{item[2]}'
+            if item[1] else f'{Fore.BLUE}{item[0]}{Fore.RESET}\n{item[2]}'
+            for item in results
+        ]),
+        f'\n\n\n{help.param}'
+    )
+
+
+def show_help(params=None):
+    print(help.base)
 
 
 if __name__ == '__main__':
