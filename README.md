@@ -4,21 +4,19 @@ Instead of memorizing all commands you may frequently use try ***`semantic_git`*
 <br><br>
 
 ### Examples:
-- creating new repository:
 ```bash
-$ create new repository  
-
 # to create a new repository with 'main' as default branch
 $ create new repository with main as default branch
+
+# to discard all uncommited changes
+$ undo all changes
 ```
-
-<br><br>
-
+<br><br>  
 
 ## How to install
 first clone the repository:
 ```bash
-$ git clone 
+$ git clone https://github.com/mese79/semantic_git.git
 ```
 then enter the cloned directory and install it:
 ```bash
@@ -27,16 +25,43 @@ $ pip install -e .
 # or
 $ python setup.py develop
 ```
-<br><br>
+<br><br>  
 
-## Making/Updating datasets
+## Help and Utility Commands
+Issue **`sgit help`** command to view brief help and utility commands which are not related to `git` but `sgit` itself.  
+<br><br>  
+
+## Generate or Update Datasets
 You may edit `original_cmd_table.csv` file to add/update your semantic commands and then run this to rebuild datasets:
-```bash
-$ sgit --make-db
+```
+$ sgit generate dataset
 ```
 Or you can build datasets out of your csv file:
-```bash
-$ sgit --make-db path/to/your/csv
 ```
-Also there is `git_helper.py` to develop more functionality that simple git command can not provide.
-<br><br>
+$ sgit generate dataset from path/to/your/csv
+```
+<br><br>  
+
+## Commands
+To view list of all available commands issue ```sgit list commands```. But it's going to be a long list! However, each command has few *tags* assign to. *tags* include git subcommand and categories of the intended command (don't confuse these tags with git tags). To view list of command tags:
+```
+$ sgit list command tags
+```  
+So you can get list of commands include a *tag*. for example:
+```bash
+# commands with 'undo' tag assign to
+$ sgit list commands by tag undo
+```  
+Also there is a `git_helper.py` to develop python functions that simple git command can not provide easily.  
+<br/><br/>  
+
+### Future ToDo List:
+- Add more git commands
+- Autocomplete feature on console &lt;tab&gt; key
+- Command suggestion feature if user command was not found
+- Simple spell checker
+- Provide more and better help
+- Using a language model like *word2vec* to find closest valid command (not sure!)
+- Preparing breakfast :grin:
+  
+<br/><br/>  
