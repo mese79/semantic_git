@@ -14,10 +14,6 @@ def print_error(log: str):
 
 
 def run_command(command):
-    print(
-        f'running command:\n  {Back.BLUE}{Fore.WHITE}{command}'
-        f'{Back.RESET}{Fore.RESET}\n'
-    )
     # split shell command into proper parts
     command = shlex.split(command)
     # insert coloring options for git output

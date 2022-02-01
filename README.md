@@ -6,10 +6,10 @@ Instead of memorizing all commands you may frequently use try ***`semantic_git`*
 ### Examples:
 ```bash
 # to create a new repository with 'main' as default branch
-$ create new repository with main as default branch
+$ sgit create new repository with main as default branch
 
 # to discard all uncommited changes
-$ undo all changes
+$ sgit undo all changes
 ```
 <br><br>  
 
@@ -25,6 +25,9 @@ $ pip install -e .
 # or
 $ python setup.py develop
 ```
+#### Requirements:
+- [colorama](https://github.com/tartley/colorama)
+
 <br><br>  
 
 ## Help and Utility Commands
@@ -52,7 +55,7 @@ So you can get list of commands include a *tag*. for example:
 # commands with 'undo' tag assign to
 $ sgit list commands by tag undo
 ```  
-Also there is a `git_helper.py` to develop python functions that simple git command can not provide easily.  
+Also there is a `git_helper.py` to develop python functions that extend git command capabilities.  
 <br/><br/>  
 
 ### Future ToDo List:
@@ -61,7 +64,7 @@ Also there is a `git_helper.py` to develop python functions that simple git comm
 - Command suggestion feature if user command was not found
 - Simple spell checker
 - Provide more and better help
-- Using a language model like *word2vec* to find closest valid command (not sure!)
+- Using a language model like *word2vec* to find closest valid command (maybe)
 - Preparing breakfast :grin:
   
 <br/><br/>  

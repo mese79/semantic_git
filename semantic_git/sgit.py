@@ -117,6 +117,10 @@ def main():
         # matched!
         # insert input parameters into command and run the final git command.
         command = command.format(*params)
+        print(
+            f'running command:\n  {Back.BLUE}{Fore.WHITE}{command}'
+            f'{Back.RESET}{Fore.RESET}\n'
+        )
         if not args.demo:
             run_command(command)
 
