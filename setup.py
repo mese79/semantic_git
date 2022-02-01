@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 version = '0.1.0'
 
-description = 'Git commands in semantic way like plain english.'
+description = 'Git commands in plain english'
 cur_dir = os.path.dirname(__file__)
 try:
     long_description = open(os.path.join(cur_dir, 'README.md')).read()
