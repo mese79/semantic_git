@@ -115,6 +115,8 @@ def main():
 
     else:
         # matched!
+        # to replace {*} with last param:
+        command = command.replace('{*}', f'{{{num_params - 1}}}')
         # insert input parameters into command and run the final git command.
         command = command.format(*params)
         print(
