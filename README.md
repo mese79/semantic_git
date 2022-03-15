@@ -30,6 +30,22 @@ $ python setup.py develop
 
 <br><br>  
 
+### Auto-Complete (bash)  
+To add auto-complete feature into current bash console run this after install:
+```bash
+$ source sgit_bash_completer
+```
+To have this feature enabled in all bash consoles add this line into your `~/.bashrc` file:
+```
+complete -o default -C 'sgit_completer "|start|" ${COMP_LINE} "|end|"' sgit
+```
+And then run
+```bash
+source ~/.bashrc
+```
+
+<br><br>  
+
 ## Help and Utility Commands
 Issue **`sgit help`** command to view brief help and utility commands which are not related to `git` but `sgit` itself.  
 <br><br>  
@@ -59,12 +75,12 @@ Also there is a `git_helper.py` to develop python functions that extend git comm
 <br/><br/>  
 
 ### Future ToDo List:
-- Add more git commands
-- Autocomplete feature on console &lt;tab&gt; key
-- Command suggestion feature if user command was not found
-- Simple spell checker
-- Provide more and better help
-- Using a language model like *word2vec* to find closest valid command (maybe)
-- Preparing breakfast :grin:
+- [ ] Add more git commands
+- [x] Autocomplete feature on console &lt;tab&gt; key (*done only for bash*)
+- [ ] Command suggestion feature if user command was not found
+- [ ] Simple spell checker
+- [ ] Provide more and better help
+- [ ] Using a language model like *word2vec* to find closest valid command (maybe)
+- [ ] Preparing breakfast :grin:
   
 <br/><br/>  

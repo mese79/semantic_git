@@ -1,0 +1,2 @@
+#!/bin/bash
+complete -o default -C 'sgit_completer "|start|" ${COMP_LINE} "|end|"' sgit

@@ -2,7 +2,7 @@ import os
 from setuptools import setup, find_packages
 
 
-version = '0.1.0'
+version = '0.1.1'
 
 description = 'Git commands in plain english'
 cur_dir = os.path.dirname(__file__)
@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'setuptools', 'colorama',
     ],
+    scripts=['semantic_git/sgit_completer', 'semantic_git/sgit_bash_completer'],
     entry_points="""
     [console_scripts]
     sgit = sgit:main
