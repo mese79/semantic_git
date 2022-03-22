@@ -84,7 +84,7 @@ def ignore(params: list):
     # create .gitignore file if not exists
     # and append given files into it.
     # get ignored file names from params
-    ignored = [Path(p).name for p in params]
+    ignored = [Path(p).resolve().relative_to(Path.cwd()) for p in params]
     with open(Path.cwd().joinpath('.gitignore'), mode='a') as f:
         f.write('\n')
         f.write('\n'.join(ignored))

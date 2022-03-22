@@ -56,7 +56,7 @@ rename branch {0} to {1},git branch -m {0} {1},0:current name|1:new name,branch|
 rename branch {0} to {1} by force,git branch -M {0} {1},0:current name|1:new name,branch|rename,rename a given branch to new given name even if new name exists already,"https://git-scm.com/docs/git-branch"
 copy branch {0} to {1},git branch -c {0} {1},0:name of source branch|1:name of destination branch,branch|copy,copy a given branch and its content into a new branch by given name,"https://git-scm.com/docs/git-branch"
 copy branch {0} to {1} by force,git branch -c {0} {1},0:name of source branch|1:name of destination branch,branch|copy,copy a given branch and its content into a new branch by given name if new name exists already,"https://git-scm.com/docs/git-branch"
-delete branch {*},git branch -d {*},*:branch name(s) separated by space,branch|delete|remove,delete given branches,"https://git-scm.com/docs/git-branch"
+delete branch {0},git branch -d {0},0:branch name to delete,branch|delete|remove,delete given branch,"https://git-scm.com/docs/git-branch"
 delete branch {0} by force,git branch -D {0},0:name of branch to delete,branch|delete|remove,delete a given branch forcibly,"https://git-scm.com/docs/git-branch"
 delete remote branch {0},git branch -r -d {0},0:name of remote branch to delete,branch|delete|remove|remote,delete a given remote branch,"https://git-scm.com/docs/git-branch"
 switch to {0},git switch {0},0:name of branch to switch to,branch|switch,switch to a given branch,"https://git-scm.com/docs/git-switch"
